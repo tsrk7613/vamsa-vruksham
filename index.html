@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vamsa Vruksham</title>
+</head>
+<body>
+    <h1>Welcome to Vamsa Vruksham</h1>
+    <p>Your collaborative family tree starts here!</p>
+    <h3 id="status" style="color: blue;">Connecting to Firebase...</h3>
+
+    <!-- Load the Firebase App SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+        // TODO: Replace the placeholder values below with your actual configuration keys from your screen!
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "vamsa-vruksham.firebaseapp.com",
+            projectId: "vamsa-vruksham",
+            storageBucket: "vamsa-vruksham.firebasestorage.app",
+            messagingSenderId: "957690672943",
+            appId: "YOUR_APP_ID_HERE"
+        };
+
+        // Initialize Firebase
+        try {
+            const app = initializeApp(firebaseConfig);
+            document.getElementById("status").innerText = "Successfully connected to Firebase! 🎉";
+            document.getElementById("status").style.color = "green";
+        } catch (error) {
+            document.getElementById("status").innerText = "Connection failed. Please check your configuration values.";
+            document.getElementById("status").style.color = "red";
+            console.error(error);
+        }
+    </script>
+</body>
+</html>
