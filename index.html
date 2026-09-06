@@ -14,26 +14,24 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-        // TODO: Replace the placeholder values below with your actual configuration keys from your screen!
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "vamsa-vruksham.firebaseapp.com",
-            projectId: "vamsa-vruksham",
-            storageBucket: "vamsa-vruksham.firebasestorage.app",
-            messagingSenderId: "957690672943",
-            appId: "YOUR_APP_ID_HERE"
-        };
+     // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Initialize Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            document.getElementById("status").innerText = "Successfully connected to Firebase! 🎉";
-            document.getElementById("status").style.color = "green";
-        } catch (error) {
-            document.getElementById("status").innerText = "Connection failed. Please check your configuration values.";
-            document.getElementById("status").style.color = "red";
-            console.error(error);
-        }
-    </script>
-</body>
-</html>
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDnkll3mkI-T4MawVuODtIgnIoDmY7UWTM",
+  authDomain: "vamsa-vruksham.firebaseapp.com",
+  projectId: "vamsa-vruksham",
+  storageBucket: "vamsa-vruksham.firebasestorage.app",
+  messagingSenderId: "957690672943",
+  appId: "1:957690672943:web:bd2f0a12b2c35fa83613da",
+  measurementId: "G-NKDPH1XWDL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
