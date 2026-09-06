@@ -8,10 +8,11 @@
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-        #login-screen, #app-screen { display: none; margin-top: 20px; }
+        #auth-screen, #app-screen { display: none; margin-top: 20px; }
         #mynetwork { width: 100%; height: 500px; border: 1px solid lightgray; margin-top: 20px; background-color: #f9f9f9; }
         input, button { padding: 10px; margin: 5px; font-size: 16px; }
         button { cursor: pointer; background-color: #0056b3; color: white; border: none; border-radius: 4px; }
+        .toggle-link { color: blue; text-decoration: underline; cursor: pointer; display: block; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -21,13 +22,17 @@
     <!-- Status Message -->
     <h3 id="status" style="color: blue;">Connecting to Firebase...</h3>
 
-    <!-- Login Screen -->
-    <div id="login-screen">
-        <h3>Please Log In</h3>
+    <!-- Authentication Screen (Log In & Sign Up) -->
+    <div id="auth-screen">
+        <h3 id="auth-title">Please Log In</h3>
         <input type="email" id="email" placeholder="Email Address" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
+        <input type="password" id="password" placeholder="Password (min 6 chars)" required><br>
+        
         <button id="login-btn">Log In</button>
-        <p id="login-error" style="color: red;"></p>
+        <button id="signup-btn" style="display: none;">Sign Up</button>
+        
+        <p id="auth-error" style="color: red;"></p>
+        <a class="toggle-link" id="toggle-auth">Need an account? Sign up here.</a>
     </div>
 
     <!-- Main Family Tree Screen -->
@@ -40,7 +45,7 @@
     <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // Your exact, correct Firebase keys:
         const firebaseConfig = {
@@ -58,17 +63,42 @@
             const auth = getAuth(app);
             
             const statusEl = document.getElementById("status");
-            const loginScreen = document.getElementById("login-screen");
+            const authScreen = document.getElementById("auth-screen");
             const appScreen = document.getElementById("app-screen");
+            
+            // Toggle Logic Variables
+            let isLoginMode = true;
+            const authTitle = document.getElementById("auth-title");
+            const loginBtn = document.getElementById("login-btn");
+            const signupBtn = document.getElementById("signup-btn");
+            const toggleAuth = document.getElementById("toggle-auth");
+            const authError = document.getElementById("auth-error");
+
+            // Switch between Login and Signup
+            toggleAuth.addEventListener("click", () => {
+                isLoginMode = !isLoginMode;
+                authError.textContent = "";
+                if (isLoginMode) {
+                    authTitle.textContent = "Please Log In";
+                    loginBtn.style.display = "inline-block";
+                    signupBtn.style.display = "none";
+                    toggleAuth.textContent = "Need an account? Sign up here.";
+                } else {
+                    authTitle.textContent = "Create an Account";
+                    loginBtn.style.display = "none";
+                    signupBtn.style.display = "inline-block";
+                    toggleAuth.textContent = "Already have an account? Log in here.";
+                }
+            });
 
             // Check if user is logged in
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     statusEl.style.display = "none";
-                    loginScreen.style.display = "none";
+                    authScreen.style.display = "none";
                     appScreen.style.display = "block";
                     
-                    // Draw the initial family tree with you as the root node
+                    // Draw the initial family tree
                     const container = document.getElementById('mynetwork');
                     const data = { 
                         nodes: [{id: 1, label: 'Sri Ramakrishna', shape: 'box', color: '#lightblue'}], 
@@ -78,23 +108,37 @@
                 } else {
                     statusEl.style.display = "none";
                     appScreen.style.display = "none";
-                    loginScreen.style.display = "block";
+                    authScreen.style.display = "block";
                 }
             });
 
             // Handle Log In
-            document.getElementById("login-btn").addEventListener("click", () => {
+            loginBtn.addEventListener("click", () => {
                 const email = document.getElementById("email").value;
                 const password = document.getElementById("password").value;
-                const errorEl = document.getElementById("login-error");
-                errorEl.textContent = "Logging in...";
-                errorEl.style.color = "blue";
+                authError.textContent = "Logging in...";
+                authError.style.color = "blue";
                 
                 signInWithEmailAndPassword(auth, email, password)
-                    .then(() => { errorEl.textContent = ""; })
+                    .then(() => { authError.textContent = ""; })
                     .catch((error) => {
-                        errorEl.style.color = "red";
-                        errorEl.textContent = "Login failed: Please check your email and password.";
+                        authError.style.color = "red";
+                        authError.textContent = "Login failed: Please check your credentials.";
+                    });
+            });
+
+            // Handle Sign Up
+            signupBtn.addEventListener("click", () => {
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                authError.textContent = "Creating account...";
+                authError.style.color = "blue";
+                
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => { authError.textContent = ""; })
+                    .catch((error) => {
+                        authError.style.color = "red";
+                        authError.textContent = "Sign up failed: " + error.message;
                     });
             });
 
